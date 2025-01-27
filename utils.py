@@ -43,3 +43,41 @@ def ppmi(C, verbose=False, eps=1e-8):
                 if cnt % (total//100 + 1) == 0:
                     print('%.1f%% done' % (100*cnt/total))
     return M
+
+#コンテキストを左右１つの単語とする。コンテキストとして共起する単語の頻度→共起行列
+def create_co_matrix(corpus, vocub_size, window_size=1):
+    corpus_size = len(corpus)
+    co_matrix = np.zeros((vocub_size, vocub_size), dtype=np.int32)
+
+    for idx, word_id in enumerate(corpus):
+        for i in range(1, window_size + 1):
+            left_idx = idx - 1
+            right_idx = idx + 1
+
+            if left_idx >= 0:
+                left_word_id = corpus[left_idx]
+                co_matrix[word_id, left_word_id] += 1
+
+            if right_idx < corpus_size:
+                right_word_id = corpus[right_idx]
+                co_matrix[word_id, right_word_id] += 1
+    return co_matrix
+
+def convert_one_hot(corpus, vocab_size):
+    '''コーパスをone_hot表現に変換する
+    返り値：
+    コーパスが一次元の場合→(N, vocab_size)
+    ２次元→（N, C, vocab_size）
+    '''
+    N = corpus.shape[0]
+    if corpus.ndim == 1:
+        one_hot = np.zeros((N, vocab_size), dtype=np.int32)
+        for idx, word_id in enumerate(corpus):
+            one_hot[idx, word_id] = 1
+    elif corpus.ndim == 2:
+        C = corpus.shape[1]
+        one_hot = np.zeros((N, C, vocab_size), dtype=np.int32)
+        for idx_0, word_ids in enumerate(corpus):
+            for idx_1, word_id in enumerate(word_ids):
+                one_hot[idx_0, idx_1, word_id] = 1
+    return one_hot
