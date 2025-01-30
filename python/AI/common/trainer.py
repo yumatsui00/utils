@@ -1,5 +1,5 @@
 import numpy as np
-import matplotlib as plt
+import matplotlib.pyplot as plt
 import time
 
 def clip_grads(grads, max_norm, epsilon=1e-6):
@@ -14,7 +14,7 @@ def clip_grads(grads, max_norm, epsilon=1e-6):
 			grad *= rate
 
 def remove_duplicate(params, grads):
-	'''パラメータ配列中の重複する重みを一つに集約し、その重みに対応する勾配を加算する'''
+    '''パラメータ配列中の重複する重みを一つに集約し、その重みに対応する勾配を加算する'''
     params, grads = params[:], grads[:]  # copy list
     while True:
         find_flg = False
@@ -44,7 +44,7 @@ def remove_duplicate(params, grads):
     return params, grads
 
 
-class Trainer(self, model, optimizer):
+class Trainer:
 	def __init__(self, model, optimizer):
 		self.model = model
 		self.optimizer = optimizer
@@ -73,7 +73,7 @@ class Trainer(self, model, optimizer):
 
 				loss = model.forward(batch_x, batch_t)
 				model.backward()
-				params, grads = remove_dupulicate(batch_x, batch_t)
+				params, grads = remove_duplicate(batch_x, batch_t)
 				if max_grad is not None:
 					clip_grads(grads, max_grad)
 				optimizer.update(params, grads)
@@ -85,37 +85,37 @@ class Trainer(self, model, optimizer):
 					avg_loss = total_loss / loss_count
 					elapsed_time = time.time() - start_time
 					print('| epoch %d |  iter %d / %d | time %d[s] | loss %.2f'
-                    % (self.current_epoch + 1, iters + 1, max_iters, elapsed_time, avg_loss))
-                    self.loss_list.append(float(avg_loss))
-                    total_loss, loss_count = 0, 0
-			self.current_epoh += 1
+					% (self.current_epoch + 1, iters + 1, max_iters, elapsed_time, avg_loss))
+					self.loss_list.append(float(avg_loss))
+					total_loss, loss_count = 0, 0
+			self.current_epoch += 1
 
 	def plot(self, ylim=None):
 		x = np.arange(len(self.loss_list))
 		if ylim is not None:
 			plt.ylim(*ylim)
-			plt.plot(x, self.loss_list, label='train')
-			plt.xlabel('iterations (x' + str(self.eval_interval) + ')')
-			plt.ylabel('loss')
-			plt.show()
+		plt.plot(x, self.loss_list, label='train')
+		plt.xlabel('iterations (x' + str(self.eval_interval) + ')')
+		plt.ylabel('loss')
+		plt.show()
 
 
-if __init__ == '__main__':
-	window_size = 1
-	hidden_size = 5
-	batch_size = 3
-	max_epoch = 1000
+# if __init__ == '__main__':
+# 	window_size = 1
+# 	hidden_size = 5
+# 	batch_size = 3
+# 	max_epoch = 1000
 
-	text = 'you say goodbye and I say hello'
-	corpus, word_to_id, id_to_word = preprocess(text)
-	vocab_size = len(word_to_id)
-	contexts, target = create_contexts_target(corpus, window_size)
-	target = convert_one_hot(target, vocab_size)
-	contexts = convert_one_hot(contexts, vocab_size)
+# 	text = 'you say goodbye and I say hello'
+# 	corpus, word_to_id, id_to_word = preprocess(text)
+# 	vocab_size = len(word_to_id)
+# 	contexts, target = create_contexts_target(corpus, window_size)
+# 	target = convert_one_hot(target, vocab_size)
+# 	contexts = convert_one_hot(contexts, vocab_size)
 
-	model = SimpleCBOW(vocab_size, hidden_size)
-	optimizer = Adam()
-	trainer = Trainer(model, optimizer)
+# 	model = SimpleCBOW(vocab_size, hidden_size)
+# 	optimizer = Adam()
+# 	trainer = Trainer(model, optimizer)
 
-	trainer.fit(contexts, target, max_epoch, batch_size)
-	trainer.plot()
+# 	trainer.fit(contexts, target, max_epoch, batch_size)
+# 	trainer.plot()

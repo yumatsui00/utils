@@ -1,3 +1,5 @@
+import numpy as np
+
 def cos_similarity(x, y, eps=1e-8): #eps でゼロベクトルが入力された際の０による除算対策
     nx = x / np.sqrt(np.sum(x ** 2) + eps) #正規化
     ny = y / np.sqrt(np.sum(y ** 2) + eps)
@@ -81,3 +83,41 @@ def convert_one_hot(corpus, vocab_size):
             for idx_1, word_id in enumerate(word_ids):
                 one_hot[idx_0, idx_1, word_id] = 1
     return one_hot
+
+def preprocess(text):
+    text = text.lower()
+    text = text.replace('.', ' .')
+    words = text.split(' ')
+
+    word_to_id = {}
+    id_to_word = {}
+    for word in words:
+        if word not in word_to_id:
+            new_id = len(word_to_id)
+            word_to_id[word] = new_id
+            id_to_word[new_id] = word
+
+    corpus = np.array([word_to_id[w] for w in words])
+
+    return corpus, word_to_id, id_to_word
+
+
+def create_contexts_target(corpus, window_size=1):
+    '''コンテキストとターゲットの作成
+
+    :param corpus: コーパス（単語IDのリスト）
+    :param window_size: ウィンドウサイズ（ウィンドウサイズが1のときは、単語の左右1単語がコンテキスト）
+    :return:
+    '''
+    target = corpus[window_size:-window_size]
+    contexts = []
+
+    for idx in range(window_size, len(corpus)-window_size):
+        cs = []
+        for t in range(-window_size, window_size + 1):
+            if t == 0:
+                continue
+            cs.append(corpus[idx + t])
+        contexts.append(cs)
+
+    return np.array(contexts), np.array(target)

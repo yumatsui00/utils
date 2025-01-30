@@ -8,6 +8,7 @@ class SGD:
     def update(self, params, grads):
         for i in range(len(params)):
             params[i] -= self.lr * grads[i]
+        # params -= self.lr * grads      # numpy
 
 
 class Momentum:
@@ -83,10 +84,12 @@ class Adam:
         lr_t = self.lr * np.sqrt(1.0 - self.beta2**self.iter) / (1.0 - self.beta1**self.iter)
 
         for i in range(len(params)):
-            self.m[i] += (1 - self.beta1) * (grads[i] - self.m[i])
-            self.v[i] += (1 - self.beta2) * (grads[i]**2 - self.v[i])
+            self.m[i] = self.m[i].astype(np.float64) + (1 - self.beta1) * (grads[i] - self.m[i])
+            self.v[i] = self.v[i].astype(np.float64) + (1 - self.beta2) * (grads[i]**2 - self.v[i])
+            # self.m[i] += (1 - self.beta1) * (grads[i] - self.m[i])
+            # self.v[i] += (1 - self.beta2) * (grads[i]**2 - self.v[i])
             
-            params[i] -= lr_t * self.m[i] / (np.sqrt(self.v[i]) + 1e-7)
+            params[i] = params[i].astype(np.float64) - lr_t * self.m[i] / (np.sqrt(self.v[i]) + 1e-7)
 
 
 

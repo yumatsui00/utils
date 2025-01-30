@@ -1,5 +1,6 @@
 
 from .layers import MatMul, SoftmaxWithLoss
+import numpy as np
 
 class SimpleCBOW:
     def __init__(self, vocab_size, hidden_size):
